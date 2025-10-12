@@ -8,12 +8,17 @@ button {
     width: 220px;
     background-color: #F9F4FF;
     border-radius: 15px;
-    margin: 3px;
+    margin: 7px;
     font-family: "Fustat", sans-serif;
     text-align: left;
     display: flex;
     gap: 8px;
     align-items: center;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #EEE0FF
 }
 
 i {
@@ -29,7 +34,7 @@ i {
     border-radius: 15px;
     height: 120px;
     width: 220px;
-    margin: 3px;
+    margin: 7px;
     text-align: center;
     display: flex;
     flex-direction: column;
