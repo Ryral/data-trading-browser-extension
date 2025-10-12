@@ -1,3 +1,16 @@
 body {
     color: rgb(154, 91, 255);
 }
+
+button {
+    height: 40px;
+    width: 200px;
+    background-color: #F9F4FF;
+    border-radius: 15px;
+}
+
+.dataworth {
+    background-color: #F9F4FF;
+    border: 2px solid black;
+    border-radius: 15px;
+}
