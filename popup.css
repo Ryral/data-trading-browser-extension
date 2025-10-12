@@ -1,16 +1,49 @@
 body {
-    color: rgb(154, 91, 255);
+    color: rgb(0, 0, 0);
+    font-family: "Fustat", sans-serif;
 }
 
 button {
     height: 40px;
-    width: 200px;
+    width: 220px;
     background-color: #F9F4FF;
     border-radius: 15px;
+    margin: 3px;
+    font-family: "Fustat", sans-serif;
+    text-align: left;
+    display: flex;
+    gap: 8px;
+    align-items: center;
 }
+
+i {
+    width: 20px;
+    height: 20px;
+    stroke-width: 2px;
+}
+
 
 .dataworth {
     background-color: #F9F4FF;
     border: 2px solid black;
     border-radius: 15px;
+    height: 120px;
+    width: 220px;
+    margin: 3px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+}
+
+.label {
+    font-size: 15px;
+    margin: 5 0 0 0;
+    font-weight: bold;
+}
+
+.value {
+    font-size: 35px;
+    margin: 0 0 0 0;
+    text-align: center;
+    font-weight: bold;
 }
