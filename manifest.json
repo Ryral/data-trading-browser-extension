@@ -2,10 +2,25 @@
     "manifest_version": 3,
     "name": "ValYou",
     "version": "1.0",
-    "description": "Calculates the worth of your data",
+    "description": "Calculates the value of your data",
     "action": {
         "default_popup": "popup.html",
         "default_icon": {"128": "valyou_icon_128.png"}
     },
-    "permissions": ["history", "storage", "tabs"]
+    "background": {
+        "service_worker": "background.js"
+    },
+    "permissions": [
+        "history",
+        "storage",
+        "tabs"
+    ],
+    "host_permissions": [
+        "https://*.firebaseio.com/*",
+        "https://*.firebaseapp.com/*",
+        "https://*.googleapis.com/*"
+    ],
+    "content_security_policy": {
+        "extension_pages": "script-src 'self'; object-src 'self'"
+    }
 }
