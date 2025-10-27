@@ -1,9 +1,11 @@
-// Background service worker for ValYou Chrome Extension
-// Handles URL tracking and data collection
 
 // Firebase configuration
 const FIREBASE_PROJECT_ID = 'valyou-bc6d4';
 const FIREBASE_API_KEY = 'AIzaSyAyd0nrr1Z2QnyH8Qbd1r3gpltWZ8jGbu0';
+const URL_WORTH_PER_URL = 0.10; // $0.10 per URL
+
+
+let currentUser = null;
 
 // Simple URL History Repository
 class URLHistoryRepo {
@@ -41,12 +43,15 @@ class URLHistoryRepo {
       // Update existing entry
       this.urls[existingIndex].timestamp = urlEntry.timestamp;
       this.urls[existingIndex].visitCount = (this.urls[existingIndex].visitCount || 1) + 1;
+      console.log('Updated existing URL:', urlEntry.url, 'visit count:', this.urls[existingIndex].visitCount);
     } else {
       // Add new URL entry
       this.urls.push(urlEntry);
+      console.log('Added new URL:', urlEntry.url, 'total URLs:', this.urls.length);
     }
 
     this.save();
+    console.log('URLs saved to storage, total count:', this.urls.length);
   }
 
   async getAllURLs() {
@@ -91,7 +96,6 @@ class URLHistoryRepo {
   }
 }
 
-// Initialize URL history repository
 const urlHistoryRepo = new URLHistoryRepo();
 
 // URL tracking variables
@@ -123,38 +127,32 @@ function setupTabListeners() {
   
   // Track when tabs are updated (user navigates to new page)
   chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-    console.log('Tab updated event:', tabId, changeInfo.status, tab.url);
     if (changeInfo.status === 'complete' && tab.url && isValidUrl(tab.url)) {
-      console.log('Tracking URL visit from tab update:', tab.url);
       trackUrlVisit(tab);
     }
   });
 
   // Track when new tabs are created
   chrome.tabs.onCreated.addListener((tab) => {
-    console.log('New tab created:', tab.url);
     if (tab.url && isValidUrl(tab.url)) {
-      console.log('Tracking URL visit from new tab:', tab.url);
       trackUrlVisit(tab);
     }
   });
 
   // Track when tabs are activated (user switches between tabs)
   chrome.tabs.onActivated.addListener((activeInfo) => {
-    console.log('Tab activated:', activeInfo.tabId);
     handleTabActivation(activeInfo.tabId);
   });
 
   // Track when tabs are removed (calculate final visit duration)
   chrome.tabs.onRemoved.addListener((tabId, removeInfo) => {
-    console.log('Tab removed:', tabId);
     handleTabRemoval(tabId);
   });
 }
 
 // Track a URL visit
 function trackUrlVisit(tab) {
-  console.log('trackUrlVisit called with:', tab.url);
+  console.log('trackUrlVisit called:', tab.url, 'isTracking:', isTracking, 'currentUser:', currentUser?.email);
   
   if (!isTracking) {
     console.log('Tracking is disabled');
@@ -169,7 +167,7 @@ function trackUrlVisit(tab) {
   // Avoid tracking duplicate URLs within a short time window
   const urlKey = `${tab.url}_${Math.floor(Date.now() / 10000)}`; // 10-second window
   if (trackedUrls.has(urlKey)) {
-    console.log('Skipping duplicate URL visit:', tab.url);
+    console.log('Skipping duplicate URL:', tab.url);
     return;
   }
   
@@ -191,7 +189,7 @@ function trackUrlVisit(tab) {
     domain: extractDomain(tab.url)
   };
 
-  console.log('Processing URL data:', urlData);
+  console.log('Adding URL to repository:', urlData);
 
   // Add to local repository
   urlHistoryRepo.addURL(urlData);
@@ -201,9 +199,9 @@ function trackUrlVisit(tab) {
     visitStartTime = Date.now();
   }
 
-  console.log('Successfully tracked URL visit:', urlData.url);
+  console.log('Tracked URL:', urlData.url);
   
-  // Sync to Firebase immediately (as you preferred)
+  // Sync to Firebase immediately
   syncToFirebase(urlData);
 }
 
@@ -288,7 +286,7 @@ async function syncToFirebase(urlData) {
         visitCount: { integerValue: urlData.visitCount.toString() },
         domain: { stringValue: urlData.domain || '' },
         syncedAt: { stringValue: new Date().toISOString() },
-        userId: { stringValue: 'anonymous' },
+        userId: { stringValue: currentUser?.email || 'anonymous' },
         source: { stringValue: 'chrome-extension' }
       }
     };
@@ -309,10 +307,196 @@ async function syncToFirebase(urlData) {
   }
 }
 
+// This duplicate message listener is removed - see the main one below
+
+// Handle extension icon click
+chrome.action.onClicked.addListener((tab) => {
+  console.log('Extension icon clicked');
+});
+
+// Cleanup on extension shutdown
+chrome.runtime.onSuspend.addListener(() => {
+  console.log('ValYou extension suspended');
+  
+  // Calculate final visit duration if needed
+  if (currentTabId && visitStartTime) {
+    const duration = Date.now() - visitStartTime;
+    updateVisitDuration(currentTabId, duration);
+  }
+});
+
+// User repository for managing user data
+class UserRepo {
+  constructor() {
+    this.key = 'user_data';
+  }
+
+  async get() {
+    return new Promise((resolve) => {
+      chrome.storage.local.get([this.key], (result) => {
+        resolve(result[this.key] || null);
+      });
+    });
+  }
+
+  async save(userData) {
+    chrome.storage.local.set({ [this.key]: userData });
+  }
+
+  async clear() {
+    chrome.storage.local.remove([this.key]);
+  }
+}
+
+// URL sale tracker
+class URLSaleTracker {
+  constructor() {
+    this.key = 'url_sales';
+  }
+
+  async load() {
+    return new Promise((resolve) => {
+      chrome.storage.local.get([this.key], (result) => {
+        resolve(result[this.key] || []);
+      });
+    });
+  }
+
+  async save(sales) {
+    chrome.storage.local.set({ [this.key]: sales });
+  }
+
+  async addSale(saleData) {
+    const sales = await this.load();
+    sales.push(saleData);
+    await this.save(sales);
+    return sales;
+  }
+
+  async getTotalEarnings() {
+    const sales = await this.load();
+    return sales.reduce((total, sale) => total + (sale.amount || 0), 0);
+  }
+}
+
+const userRepo = new UserRepo();
+const saleTracker = new URLSaleTracker();
+
+// Simple email-based authentication (no OAuth required)
+async function signInWithGoogle() {
+  // For demo purposes, create a mock user
+  const mockUser = {
+    email: 'demo@valyou.com',
+    name: 'Demo User',
+    uid: 'demo-user-123'
+  };
+  
+  await userRepo.save(mockUser);
+  currentUser = mockUser;
+  
+  // Sync user data to Firebase
+  await syncUserToFirebase(mockUser);
+  
+  return mockUser;
+}
+
+// Alternative: Simple form-based authentication
+async function signInWithEmail(email, name) {
+  const userData = {
+    email: email,
+    name: name || 'User',
+    uid: email.replace('@', '-').replace('.', '-')
+  };
+  
+  await userRepo.save(userData);
+  currentUser = userData;
+  
+  // Sync user data to Firebase
+  await syncUserToFirebase(userData);
+  
+  return userData;
+}
+
+// Sync user data to Firebase
+async function syncUserToFirebase(userData) {
+  try {
+    const firebaseUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/users?key=${FIREBASE_API_KEY}`;
+    
+    const docData = {
+      fields: {
+        email: { stringValue: userData.email },
+        name: { stringValue: userData.name || '' },
+        uid: { stringValue: userData.uid || '' },
+        syncedAt: { stringValue: new Date().toISOString() },
+        source: { stringValue: 'chrome-extension' }
+      }
+    };
+    
+    const response = await fetch(firebaseUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(docData)
+    });
+    
+    if (response.ok) {
+      console.log('User synced to Firebase:', userData.email);
+    } else {
+      console.error('User Firebase sync failed:', response.statusText);
+    }
+  } catch (error) {
+    console.error('User Firebase sync error:', error);
+  }
+}
+
+// Sync sale data to Firebase
+async function syncSaleToFirebase(saleData) {
+  try {
+    const firebaseUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/sales?key=${FIREBASE_API_KEY}`;
+    
+    const docData = {
+      fields: {
+        userId: { stringValue: currentUser?.email || 'anonymous' },
+        amount: { doubleValue: saleData.amount },
+        urlCount: { integerValue: saleData.count.toString() },
+        timestamp: { integerValue: saleData.timestamp.toString() },
+        syncedAt: { stringValue: new Date().toISOString() },
+        source: { stringValue: 'chrome-extension' }
+      }
+    };
+    
+    const response = await fetch(firebaseUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(docData)
+    });
+    
+    if (response.ok) {
+      console.log('Sale synced to Firebase:', saleData.amount);
+    } else {
+      console.error('Sale Firebase sync failed:', response.statusText);
+    }
+  } catch (error) {
+    console.error('Sale Firebase sync error:', error);
+  }
+}
+
+function signOut() {
+  userRepo.clear();
+  currentUser = null;
+  chrome.identity.getAuthToken({ 'interactive': false }, (token) => {
+    if (token) {
+      chrome.identity.removeCachedAuthToken({ token }, () => {});
+    }
+  });
+}
+
+// Calculate URL worth
+function calculateURLWorth(urlCount) {
+  return (urlCount * URL_WORTH_PER_URL).toFixed(2);
+}
+
 // Handle messages from popup/content scripts
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  console.log('Received message:', request);
-  
   switch (request.action) {
     case 'ping':
       sendResponse({ status: 'pong', timestamp: Date.now() });
@@ -320,14 +504,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       
     case 'getStats':
       urlHistoryRepo.getStats().then(stats => {
-        console.log('Sending stats:', stats);
         sendResponse(stats);
       });
       return true; // Keep message channel open for async response
       
     case 'getAllURLs':
       urlHistoryRepo.getAllURLs().then(urls => {
-        console.log('Sending URLs:', urls.length);
         sendResponse(urls);
       });
       return true; // Keep message channel open for async response
@@ -349,6 +531,77 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         trackedUrlsCount: trackedUrls.size
       });
       break;
+
+    case 'signInWithGoogle':
+      signInWithGoogle().then(user => {
+        sendResponse({ success: true, user });
+      }).catch(error => {
+        sendResponse({ success: false, error: error.message });
+      });
+      return true;
+
+    case 'signInWithEmail':
+      const { email, name } = request;
+      signInWithEmail(email, name).then(user => {
+        sendResponse({ success: true, user });
+      }).catch(error => {
+        sendResponse({ success: false, error: error.message });
+      });
+      return true;
+
+    case 'signOut':
+      signOut();
+      sendResponse({ success: true });
+      break;
+
+    case 'getCurrentUser':
+      userRepo.get().then(user => {
+        sendResponse({ user });
+      });
+      return true;
+
+    case 'calculateURLWorth':
+      urlHistoryRepo.getAllURLs().then(urls => {
+        const worth = calculateURLWorth(urls.length);
+        sendResponse({ count: urls.length, worth });
+      });
+      return true;
+
+    case 'sellURLs':
+      urlHistoryRepo.getAllURLs().then(async urls => {
+        const worth = parseFloat(calculateURLWorth(urls.length));
+        const saleData = {
+          amount: worth,
+          count: urls.length,
+          timestamp: Date.now()
+        };
+        await saleTracker.addSale(saleData);
+        
+        // Sync sale to Firebase
+        await syncSaleToFirebase(saleData);
+        
+        urlHistoryRepo.clear();
+        sendResponse({ success: true, sold: saleData });
+      });
+      return true;
+
+    case 'getTotalEarnings':
+      saleTracker.getTotalEarnings().then(earnings => {
+        sendResponse({ earnings });
+      });
+      return true;
+
+    case 'getURLCount':
+      urlHistoryRepo.getAllURLs().then(urls => {
+        sendResponse({ count: urls.length });
+      });
+      return true;
+
+    case 'getSalesHistory':
+      saleTracker.load().then(sales => {
+        sendResponse({ sales: sales.sort((a, b) => b.timestamp - a.timestamp) });
+      });
+      return true;
       
     default:
       console.log('Unknown action:', request.action);
@@ -356,20 +609,23 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 });
 
-// Handle extension icon click
-chrome.action.onClicked.addListener((tab) => {
-  console.log('Extension icon clicked');
+// Initialize on startup
+chrome.runtime.onStartup.addListener(async () => {
+  console.log('ValYou extension started');
+  currentUser = await userRepo.get();
+  initializeTracking();
 });
 
-// Cleanup on extension shutdown
-chrome.runtime.onSuspend.addListener(() => {
-  console.log('ValYou extension suspended');
+chrome.runtime.onInstalled.addListener(async (details) => {
+  console.log('ValYou extension installed', details.reason);
+  currentUser = await userRepo.get();
   
-  // Calculate final visit duration if needed
-  if (currentTabId && visitStartTime) {
-    const duration = Date.now() - visitStartTime;
-    updateVisitDuration(currentTabId, duration);
+  if (details.reason === 'install') {
+    // Trigger Google sign-in on first install
+    chrome.tabs.create({ url: 'popup.html' });
   }
+  
+  initializeTracking();
 });
 
 console.log('ValYou background service worker loaded');

@@ -10,28 +10,67 @@
         <link href="https://fonts.googleapis.com/css2?family=Fustat:wght@200..800&display=swap" rel="stylesheet">
     </head>
     <body>
-        <div class="dataworth">
-            <p class ="label">Your data is worth:</p>
-            <p class ="value">$0.00</p>
+        <!-- Authentication Section -->
+        <div id="auth-section" class="auth-section" style="display: none;">
+            <div class="user-info">
+                <p id="user-name" class="user-name"></p>
+                <p id="user-email" class="user-email"></p>
+            </div>
+            <button id="sign-out" class="sign-out-btn">
+                <i data-lucide="log-out"></i>
+                Sign Out
+            </button>
         </div>
-        <div class ="buttons">
-            <button id="marketplace">
-                <i data-lucide="store"></i>
-                Go to marketplace
-            </button>
-            <button id="dashboard">
-                <i data-lucide="layout-dashboard"></i>
-                Go to my dashboard
-            </button>
-            <button id="browserhistory">
-                <i data-lucide="book-open"></i>
-                Browser history
-            </button>
-            <button id="enable/disable">
-                <i data-lucide="settings"></i>
-                Disable
-                <!-- Changes to 'Enable' when turned disabled-->
-            </button>
+
+        <!-- Login Section -->
+        <div id="login-section" class="login-section">
+            <div class="login-content">
+                <h2>Welcome to ValYou</h2>
+                <p>Sign in to start tracking your data worth</p>
+                <button id="sign-in" class="sign-in-btn">
+                    <i data-lucide="log-in"></i>
+                    Sign in (Demo)
+                </button>
+                <div class="login-form" style="margin-top: 15px; display: none;">
+                    <input type="email" id="email-input" placeholder="Enter your email" style="width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ddd; border-radius: 5px;">
+                    <input type="text" id="name-input" placeholder="Enter your name" style="width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ddd; border-radius: 5px;">
+                    <button id="sign-in-email" class="sign-in-btn" style="width: 100%; margin-top: 10px;">
+                        <i data-lucide="mail"></i>
+                        Sign in with Email
+                    </button>
+                </div>
+                <button id="show-email-form" class="secondary-btn" style="margin-top: 10px; background: #f0f0f0; color: #666;">
+                    <i data-lucide="mail"></i>
+                    Use Email Instead
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div id="main-content" style="display: none;">
+            <div class="dataworth">
+                <p class="label">Your data is worth:</p>
+                <p class="value" id="data-worth">$0.00</p>
+                <p class="url-count" id="url-count">0 URLs collected</p>
+            </div>
+            <div class="buttons">
+                <button id="marketplace">
+                    <i data-lucide="store"></i>
+                    Go to marketplace
+                </button>
+                <button id="dashboard">
+                    <i data-lucide="layout-dashboard"></i>
+                    Go to my dashboard
+                </button>
+                <button id="browserhistory">
+                    <i data-lucide="book-open"></i>
+                    Browser history
+                </button>
+                <button id="settings">
+                    <i data-lucide="settings"></i>
+                    Settings
+                </button>
+            </div>
         </div>
         <script src="lucide.js"></script>
         <script src="popup.js"></script>

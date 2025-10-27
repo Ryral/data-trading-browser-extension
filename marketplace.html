@@ -3,32 +3,47 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Marketplace</title>
+    <title>Marketplace - ValYou</title>
     <link rel="stylesheet" href="page.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fustat:wght@200..800&display=swap" rel="stylesheet">
 </head>
-
 <body>
-<div class="titlediv">Marketplace</div>
-
-<div class="infodiv">
-    <p>Your data is currently worth:</p>
-
-    <div class="worth">
-        <p>$0.00 <br></p>
+    <div class="container">
+        <h1>
+            <i data-lucide="store"></i>
+            Marketplace
+        </h1>
+        
+        <div class="data-card">
+            <h3>Your Collected Data</h3>
+            <div class="value" id="url-count">0</div>
+            <div class="subtitle">URLs collected</div>
+        </div>
+        
+        <div class="data-card">
+            <h3>Current Value</h3>
+            <div class="value" id="data-value">$0.00</div>
+            <div class="subtitle">At $0.10 per URL</div>
+        </div>
+        
+        <div class="message info">
+            <i data-lucide="info"></i>
+            Each URL you visit is worth $0.10. Sell your collected URLs to earn money!
+        </div>
+        
+        <div style="text-align: center; margin: 30px 0;">
+            <button id="sell-button" class="primary" disabled>
+                <i data-lucide="dollar-sign"></i>
+                Sell URLs ($0.00)
+            </button>
+        </div>
+        
+        <div id="sell-message" class="message" style="display: none;"></div>
     </div>
-
-    <p>Current URLs count:</p>
-
-    <div class="urlcount">
-        <p>0 <br></p>
-    </div>
-    <button>Sell</button>
-
-</div>
-
+    
+    <script src="lucide.js"></script>
+    <script src="marketplace.js"></script>
 </body>
-
 </html>

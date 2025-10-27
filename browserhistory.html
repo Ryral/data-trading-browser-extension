@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Browser History - ValYou</title>
+    <link rel="stylesheet" href="page.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fustat:wght@200..800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>
+            <i data-lucide="book-open"></i>
+            Browser History
+        </h1>
+        
+        <div class="message info">
+            <i data-lucide="info"></i>
+            Choose how you'd like to view your browsing history:
+        </div>
+        
+        <div style="text-align: center; margin: 30px 0;">
+            <button id="chrome-history" class="primary">
+                <i data-lucide="external-link"></i>
+                Open Chrome History
+            </button>
+        </div>
+        
+        <div style="text-align: center; margin: 20px 0;">
+            <button id="extension-history" class="success">
+                <i data-lucide="list"></i>
+                View Tracked URLs
+            </button>
+        </div>
+        
+        <div id="tracked-urls" style="display: none;">
+            <h2>
+                <i data-lucide="list"></i>
+                Tracked URLs by ValYou
+            </h2>
+            
+            <div id="urls-list">
+                <div class="loading">Loading tracked URLs...</div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="lucide.js"></script>
+    <script src="browserhistory.js"></script>
+</body>
+</html>

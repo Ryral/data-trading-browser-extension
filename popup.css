@@ -1,6 +1,10 @@
 body {
     color: rgb(0, 0, 0);
     font-family: "Fustat", sans-serif;
+    margin: 0;
+    padding: 0;
+    width: 300px;
+    min-height: 400px;
 }
 
 button {
@@ -15,6 +19,7 @@ button {
     gap: 8px;
     align-items: center;
     cursor: pointer;
+    border: none;
 }
 
 button:hover {
@@ -27,7 +32,6 @@ i {
     stroke-width: 2px;
 }
 
-
 .dataworth {
     background-color: #F9F4FF;
     border: 2px solid black;
@@ -38,17 +42,89 @@ i {
     text-align: center;
     display: flex;
     flex-direction: column;
+    justify-content: center;
 }
 
 .label {
     font-size: 15px;
-    margin: 5 0 0 0;
+    margin: 5px 0 0 0;
     font-weight: bold;
 }
 
 .value {
     font-size: 35px;
-    margin: 0 0 0 0;
+    margin: 0;
     text-align: center;
     font-weight: bold;
+}
+
+.url-count {
+    font-size: 12px;
+    margin: 5px 0 0 0;
+    color: #666;
+}
+
+/* Authentication Styles */
+.auth-section {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.user-info {
+    margin-bottom: 10px;
+}
+
+.user-name {
+    font-weight: bold;
+    margin: 0;
+    font-size: 14px;
+}
+
+.user-email {
+    margin: 0;
+    font-size: 12px;
+    color: #666;
+}
+
+.sign-out-btn {
+    width: 100%;
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+.sign-out-btn:hover {
+    background-color: #ffcdd2;
+}
+
+/* Login Styles */
+.login-section {
+    padding: 20px;
+    text-align: center;
+}
+
+.login-content h2 {
+    margin: 0 0 10px 0;
+    font-size: 20px;
+    color: #333;
+}
+
+.login-content p {
+    margin: 0 0 20px 0;
+    color: #666;
+    font-size: 14px;
+}
+
+.sign-in-btn {
+    width: 100%;
+    background-color: #4285f4;
+    color: white;
+    justify-content: center;
+}
+
+.sign-in-btn:hover {
+    background-color: #3367d6;
+}
+
+.sign-in-btn i {
+    color: white;
 }
