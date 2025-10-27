@@ -49,64 +49,75 @@ function showLoginState() {
 
 function setupEventListeners() {
     // Demo sign in button
-    document.getElementById('sign-in').addEventListener('click', async () => {
-        try {
-            const response = await chrome.runtime.sendMessage({ action: 'signInWithGoogle' });
-            if (response.success) {
-                showAuthenticatedState(response.user);
-                await updateDataWorth();
-            } else {
-                alert('Sign in failed: ' + response.error);
+    const signInBtn = document.getElementById('sign-in');
+    if (signInBtn) {
+        signInBtn.addEventListener('click', async () => {
+            try {
+                const response = await chrome.runtime.sendMessage({ action: 'signInWithGoogle' });
+                if (response.success) {
+                    showAuthenticatedState(response.user);
+                    await updateDataWorth();
+                } else {
+                    alert('Sign in failed: ' + response.error);
+                }
+            } catch (error) {
+                console.error('Sign in error:', error);
+                alert('Sign in failed. Please try again.');
             }
-        } catch (error) {
-            console.error('Sign in error:', error);
-            alert('Sign in failed. Please try again.');
-        }
-    });
+        });
+    }
 
     // Show email form button
-    document.getElementById('show-email-form').addEventListener('click', () => {
-        const form = document.querySelector('.login-form');
-        const button = document.getElementById('show-email-form');
-        if (form.style.display === 'none') {
-            form.style.display = 'block';
-            button.textContent = 'Hide Email Form';
-        } else {
-            form.style.display = 'none';
-            button.innerHTML = '<i data-lucide="mail"></i> Use Email Instead';
-        }
-        if (typeof lucide !== "undefined") {
-            lucide.createIcons();
-        }
-    });
-
-    // Email sign in button
-    document.getElementById('sign-in-email').addEventListener('click', async () => {
-        const email = document.getElementById('email-input').value;
-        const name = document.getElementById('name-input').value;
-        
-        if (!email) {
-            alert('Please enter your email');
-            return;
-        }
-        
-        try {
-            const response = await chrome.runtime.sendMessage({ 
-                action: 'signInWithEmail', 
-                email: email, 
-                name: name 
-            });
-            if (response.success) {
-                showAuthenticatedState(response.user);
-                await updateDataWorth();
+    const showEmailBtn = document.getElementById('show-email-form');
+    if (showEmailBtn) {
+        showEmailBtn.addEventListener('click', () => {
+            const form = document.querySelector('.login-form');
+            const button = showEmailBtn;
+            if (form.style.display === 'none') {
+                form.style.display = 'block';
+                button.textContent = 'Hide Email Form';
             } else {
-                alert('Sign in failed: ' + response.error);
+                form.style.display = 'none';
+                button.innerHTML = '<i data-lucide="mail"></i> Use Email Instead';
             }
-        } catch (error) {
-            console.error('Sign in error:', error);
-            alert('Sign in failed. Please try again.');
-        }
-    });
+            if (typeof lucide !== "undefined") {
+                lucide.createIcons();
+            }
+        });
+    }
+
+    // Email sign in button (guarded)
+    const signInEmailBtn = document.getElementById('sign-in-email');
+    if (signInEmailBtn) {
+        signInEmailBtn.addEventListener('click', async () => {
+            const emailEl = document.getElementById('email-input');
+            const nameEl = document.getElementById('name-input');
+            const email = emailEl ? emailEl.value : '';
+            const name = nameEl ? nameEl.value : '';
+
+            if (!email) {
+                alert('Please enter your email');
+                return;
+            }
+
+            try {
+                const response = await chrome.runtime.sendMessage({ 
+                    action: 'signInWithEmail', 
+                    email: email, 
+                    name: name 
+                });
+                if (response.success) {
+                    showAuthenticatedState(response.user);
+                    await updateDataWorth();
+                } else {
+                    alert('Sign in failed: ' + response.error);
+                }
+            } catch (error) {
+                console.error('Sign in error:', error);
+                alert('Sign in failed. Please try again.');
+            }
+        });
+    }
 
     // Sign out button
     document.getElementById('sign-out').addEventListener('click', async () => {

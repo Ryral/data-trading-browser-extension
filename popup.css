@@ -1,9 +1,17 @@
 body {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    overflow-x: hidden;
+}
+
+body {
     color: rgb(0, 0, 0);
     font-family: "Fustat", sans-serif;
     margin: 0;
-    padding: 0;
-    width: 300px;
+    padding: 12px;
+    max-width: 360px;
     min-height: 400px;
 }
 
@@ -19,7 +27,6 @@ button {
     gap: 8px;
     align-items: center;
     cursor: pointer;
-    border: none;
 }
 
 button:hover {
@@ -66,7 +73,8 @@ i {
 
 /* Authentication Styles */
 .auth-section {
-    padding: 10px;
+    padding: 5px;
+    margin-left: 7px;
     border-bottom: 1px solid #eee;
 }
 
@@ -87,9 +95,9 @@ i {
 }
 
 .sign-out-btn {
-    width: 100%;
     background-color: #ffebee;
     color: #c62828;
+    margin-left: -7px;
 }
 
 .sign-out-btn:hover {
@@ -98,13 +106,13 @@ i {
 
 /* Login Styles */
 .login-section {
-    padding: 20px;
+    padding: 15px;
     text-align: center;
 }
 
 .login-content h2 {
     margin: 0 0 10px 0;
-    font-size: 20px;
+    font-size: 15px;
     color: #333;
 }
 
@@ -115,10 +123,8 @@ i {
 }
 
 .sign-in-btn {
-    width: 100%;
     background-color: #4285f4;
     color: white;
-    justify-content: center;
 }
 
 .sign-in-btn:hover {
