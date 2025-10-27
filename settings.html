@@ -3,11 +3,59 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Settings</title>
+    <title>Settings - ValYou</title>
     <link rel="stylesheet" href="page.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fustat:wght@200..800&display=swap" rel="stylesheet">
 </head>
-<body>tea</body>
-
-
-
+<body>
+    <div class="container">
+        <h1>
+            <i data-lucide="settings"></i>
+            Settings
+        </h1>
+        
+        <div class="data-card">
+            <h3>URL Tracking</h3>
+            <div class="toggle-container">
+                <span id="tracking-label">Enable URL tracking</span>
+                <div id="tracking-toggle" class="toggle-switch"></div>
+            </div>
+            <p style="font-size: 14px; color: #666; margin-top: 10px;">
+                When enabled, ValYou will track the URLs you visit to calculate your data worth.
+            </p>
+        </div>
+        
+        <div class="data-card">
+            <h3>Account</h3>
+            <div id="user-info" style="margin-bottom: 15px;">
+                <div class="loading">Loading user information...</div>
+            </div>
+            <button id="sign-out" class="danger">
+                <i data-lucide="log-out"></i>
+                Sign Out
+            </button>
+        </div>
+        
+        <div class="data-card">
+            <h3>Data Management</h3>
+            <p style="margin-bottom: 15px;">
+                Manage your collected data and earnings.
+            </p>
+            <button id="clear-data" class="danger">
+                <i data-lucide="trash-2"></i>
+                Clear All Data
+            </button>
+            <p style="font-size: 12px; color: #666; margin-top: 10px;">
+                Warning: This will permanently delete all your tracked URLs and sales history.
+            </p>
+        </div>
+        
+        <div id="status-message" class="message" style="display: none;"></div>
+    </div>
+    
+    <script src="lucide.js"></script>
+    <script src="settings.js"></script>
+</body>
 </html>

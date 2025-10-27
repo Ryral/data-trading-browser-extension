@@ -3,11 +3,52 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dashboard</title>
+    <title>Dashboard - ValYou</title>
     <link rel="stylesheet" href="page.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fustat:wght@200..800&display=swap" rel="stylesheet">
 </head>
-<body>tea</body>
-
-
-
+<body>
+    <div class="container">
+        <h1>
+            <i data-lucide="layout-dashboard"></i>
+            Dashboard
+        </h1>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="total-urls">0</div>
+                <div class="stat-label">Total URLs Visited</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-number" id="total-earnings">$0.00</div>
+                <div class="stat-label">Total Money Earned</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-number" id="current-urls">0</div>
+                <div class="stat-label">Current URLs Collected</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-number" id="current-value">$0.00</div>
+                <div class="stat-label">Current Data Value</div>
+            </div>
+        </div>
+        
+        <h2>
+            <i data-lucide="trending-up"></i>
+            Sales History
+        </h2>
+        
+        <div id="sales-history">
+            <div class="loading">Loading sales history...</div>
+        </div>
+    </div>
+    
+    <script src="lucide.js"></script>
+    <script src="dashboard.js"></script>
+</body>
 </html>
